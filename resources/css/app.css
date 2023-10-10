@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+code {
+    @apply bg-gray-100;
+    @apply text-red-800;
+    @apply py-1;
+    @apply px-3;
+}
