@@ -7,6 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Livewire\Livewire;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,18 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        //TODO: Fix the 404 on prod when looking for livewire.js
+// https://github.com/livewire/livewire/discussions/6328
+//        Livewire::setUpdateRoute(function ($handle) {
+//            return Route::post(env("APP_SUBPATH") . '/livewire/update', $handle);
+//        });
+//
+////        https://laracasts.com/discuss/channels/livewire/has-anyone-got-livewire-3-running-in-production-on-a-nginx-server?page=1&replyId=916472
+//        Livewire::setScriptRoute(function ($handle) {
+//            return Route::get(env("APP_SUBPATH") . '/livewire/livewirejs', $handle);
+//        });
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
