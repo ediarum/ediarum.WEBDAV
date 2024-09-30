@@ -50,35 +50,35 @@ class WebDavController extends Controller
 //
 //        $server->httpRequest->setUrl($fullPath);
 
-        if(!Storage::disk('local')->exists('webdav-locks')){
-            Storage::disk('local')->makeDirectory('webdav-locks');
+        //Note sure why errors are not getting logged...
+        try {
+            if (!Storage::disk('local')->exists('webdav-locks')) {
+                Storage::disk('local')->makeDirectory('webdav-locks');
+            }
+            $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
+            $lockPlugin = new DAV\Locks\Plugin($lockBackend);
+            $server->addPlugin($lockPlugin);
+
+            $server->addPlugin(new DAV\Browser\Plugin());
+
+            $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
+            foreach ($events as $event) {
+                $server->on($event, function ($path, $destinationPath) use ($event, $project) {
+
+                        if ($event == "afterMove") {
+                            DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
+                        } else {
+                            DataChange::dispatch(Auth::user()->email, $project, $event, $path);
+                        }
+                });
+            }
+            $server->start();
+        } catch (\Exception $exception) {
+            Log::error($exception->getFile());
+            Log::error($exception->getMessage());
+            Log::error($exception->getTraceAsString());
+            throw $exception;
         }
-        $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
-        $lockPlugin = new DAV\Locks\Plugin($lockBackend);
-        $server->addPlugin($lockPlugin);
-
-        $server->addPlugin(new DAV\Browser\Plugin());
-
-        $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
-        foreach ($events as $event) {
-            $server->on($event, function ($path, $destinationPath) use ($event, $project) {
-                try{
-
-                if ($event == "afterMove") {
-                    DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
-                } else {
-                    DataChange::dispatch(Auth::user()->email, $project, $event, $path);
-                }
-                }catch (\Exception $exception){
-                    Log::error($exception->getFile());
-                    Log::error($exception->getMessage());
-                    Log::error($exception->getTraceAsString());
-                    throw $exception;
-                }
-            });
-        }
-        $server->start();
-
 
         // Transform to Laravel response
         /** @var resource|string|null */
