@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Sabre\Sapi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -55,7 +56,8 @@ class WebDavController extends Controller
         if (!Storage::disk('local')->exists('webdav-locks')) {
             Storage::disk('local')->makeDirectory('webdav-locks');
         }
-        $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
+        $pdo = DB::getPdo();
+        $lockBackend = new DAV\Locks\Backend\PDO($pdo);
         $lockPlugin = new DAV\Locks\Plugin($lockBackend);
 
         $server->addPlugin($lockPlugin);
