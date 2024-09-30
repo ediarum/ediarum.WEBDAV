@@ -64,16 +64,15 @@ class WebDavController extends Controller
             $server->addPlugin(new DAV\Browser\Plugin());
 
             $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-                $lock->owner = $request->user->email;
+                $lock->owner = $request->user()->email;
             });
             $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-                $lock->owner = $request->user->email;
+                $lock->owner = $request->user()->email;
             });
 
             $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
             foreach ($events as $event) {
-                $server->on($event, function ($path, $destinationPath) use ($event, $project) {
-
+                $server->on($event, function ($path, $destinationPath = null) use ($event, $project) {
                     if ($event == "afterMove") {
                         DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
                     } else {
