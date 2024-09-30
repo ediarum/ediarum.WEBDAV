@@ -52,41 +52,34 @@ class WebDavController extends Controller
 //        $server->httpRequest->setUrl($fullPath);
 
         //Note sure why errors are not getting logged...
-        try {
-            if (!Storage::disk('local')->exists('webdav-locks')) {
-                Storage::disk('local')->makeDirectory('webdav-locks');
-            }
-            $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
-            $lockPlugin = new DAV\Locks\Plugin($lockBackend);
-
-            $server->addPlugin($lockPlugin);
-
-            $server->addPlugin(new DAV\Browser\Plugin());
-
-            $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-                $lock->owner = $request->user()->email;
-            });
-            $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-                $lock->owner = $request->user()->email;
-            });
-
-            $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
-            foreach ($events as $event) {
-                $server->on($event, function ($path, $destinationPath = null) use ($event, $project) {
-                    if ($event == "afterMove") {
-                        DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
-                    } else {
-                        DataChange::dispatch(Auth::user()->email, $project, $event, $path);
-                    }
-                });
-            }
-            $server->start();
-        } catch (\Exception $exception) {
-            Log::error($exception->getFile());
-            Log::error($exception->getMessage());
-            Log::error($exception->getTraceAsString());
-            throw $exception;
+        if (!Storage::disk('local')->exists('webdav-locks')) {
+            Storage::disk('local')->makeDirectory('webdav-locks');
         }
+        $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
+        $lockPlugin = new DAV\Locks\Plugin($lockBackend);
+
+        $server->addPlugin($lockPlugin);
+
+        $server->addPlugin(new DAV\Browser\Plugin());
+
+        $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+            $lock->owner = $request->user()->email;
+        });
+        $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+            $lock->owner = $request->user()->email;
+        });
+
+        $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
+        foreach ($events as $event) {
+            $server->on($event, function ($path, $destinationPath = null) use ($event, $project) {
+                if ($event == "afterMove") {
+                    DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
+                } else {
+                    DataChange::dispatch(Auth::user()->email, $project, $event, $path);
+                }
+            });
+        }
+        $server->start();
 
         // Transform to Laravel response
         /** @var resource|string|null */
