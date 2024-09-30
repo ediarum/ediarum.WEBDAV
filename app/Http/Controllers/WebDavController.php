@@ -41,6 +41,7 @@ class WebDavController extends Controller
         $server->sapi = $sapi;
 
         $server->setBaseUri(env("APP_SUBPATH") . '/webdav/' . $request->projectSlug);
+        $server->setLogger(Log::getLogger());
 
         //Not sure if this is necessary...
 //        $query = $request->getQueryString();
@@ -57,19 +58,27 @@ class WebDavController extends Controller
             }
             $lockBackend = new DAV\Locks\Backend\File(Storage::disk('local')->path('webdav-locks/' . $request->projectSlug));
             $lockPlugin = new DAV\Locks\Plugin($lockBackend);
+
             $server->addPlugin($lockPlugin);
 
             $server->addPlugin(new DAV\Browser\Plugin());
+
+            $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+                $lock->owner = $request->user->email;
+            });
+            $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+                $lock->owner = $request->user->email;
+            });
 
             $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];
             foreach ($events as $event) {
                 $server->on($event, function ($path, $destinationPath) use ($event, $project) {
 
-                        if ($event == "afterMove") {
-                            DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
-                        } else {
-                            DataChange::dispatch(Auth::user()->email, $project, $event, $path);
-                        }
+                    if ($event == "afterMove") {
+                        DataChange::dispatch(Auth::user()->email, $project, $event, $path, $destinationPath);
+                    } else {
+                        DataChange::dispatch(Auth::user()->email, $project, $event, $path);
+                    }
                 });
             }
             $server->start();
