@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string("owner", length: 200);
             $table->unsignedInteger("timeout");
             $table->integer("created");
-            $table->string("token", length: 200)->unique();
+            $table->string("token", length: 200)->index();
             $table->tinyInteger('scope');
             $table->tinyInteger('depth');
-            $table->string('uri', length: 1000)->unique();
+            $table->string('uri')->index();
         });
     }
 
