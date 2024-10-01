@@ -41,7 +41,6 @@ class PushToExistDb implements ShouldQueue
             $url = $res->effectiveUri();
             $status = $res->status();
             $body = $res->body();
-            $json = $res->json();
             throw new HttpResponse("Request to $url with status $status and response $body.");
         }
     }
@@ -53,10 +52,8 @@ class PushToExistDb implements ShouldQueue
 
         $content = File::get(rtrim($dataFolder, "/") . "/" . $path);
         $res = $httpClient
-            ->withOptions(['debug' => true, 'headers' => [
-                'Content-Type' => 'application/xml'
-            ]])
-            ->withBody($content)
+            ->withOptions(['debug' => true])
+            ->withBody($content, "application/xml")
             ->put($path);
         $this->handleRes($res);
     }
