@@ -11,11 +11,13 @@ It includes the following features:
 * When files are edited, the user can push those files to Ediarum.Backend (soon to be released).
 
 
-## Local Development
+## Local Development with Docker
+
+## Local Development without Docker
 
 ### Requirements:
 * `php8.1`
-* a mysql or sqlite database connection, 
+* a mysql database connection, 
 * The application works with `node 20`
 
 ### Installation
@@ -24,9 +26,10 @@ It includes the following features:
 * Install php dependencies with `composer install`
 * Install frontend dependencies with `npm install`
 * Start laravel server: `php artisan serve`
+* Start the queue: `php artisan queue:work --queue=default,gitlab,ediarum-backend,exist-db`
 * Compile frontend assets `npm run serve`
 
-### Setting up the Datase
+### Setting up the Database
 
 If starting from an empty database:
 `php artisan migrate:install`
@@ -46,6 +49,20 @@ One can use the docker files as examples if one wants to do a docker deployment,
 On the server, you need to specify the php version, so:
 `php8.1 /usr/local/bin/composer install`
 `php8.1 artisan migrate:install` etc.
+Make sure to set up the queue with supervisor. The Supervisor file looks something like this:
+```
+[program:ediarum-webdav-laravel-queue-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php8.1 path_to_ediarum.webdav/artisan queue:work --queue=default,gitlab,ediarum-backend,exist-db
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+stdout_logfile=/path_to_ediarum.webdav/storage/logs/queue.log
+stopwaitsecs=3600
+```
 
 ### And the server specific commands:
 `npm run build`

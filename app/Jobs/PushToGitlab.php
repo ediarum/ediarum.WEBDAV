@@ -31,7 +31,6 @@ class PushToGitlab implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info("Pushing to gitlab");
         $dataRepo = $this->project->data_folder_location;
 
         $auth = $this->project->gitlab_username . ":" . $this->project->gitlab_personal_access_token . "@";
@@ -39,15 +38,12 @@ class PushToGitlab implements ShouldQueue
 
         $url = Str::replace("https://", "https://$auth", $url);
 
-        Log::info("Here is the url again $url");
-
         $command = "cd $dataRepo && git push $url";
-        Log::info("Pushing now: $command");
 
         $result = Process::timeout(10)->run($command);
 
         if($result->failed()){
-            Log::info("Push failed:" . $result->errorOutput());
+            Log::error("Push failed:" . $result->errorOutput());
             throw new \Exception("Push to gitlab failed: " . $result->errorOutput());
         }
     }

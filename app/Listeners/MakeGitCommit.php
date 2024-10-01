@@ -24,12 +24,14 @@ class MakeGitCommit
      */
     public function handle(DataChange $event): void
     {
+        Log::info("Making git commit from {$event->user} for {$event->sourcePath}.");
+
         $dataRepo = $event->project->data_folder_location;
 
         $command = "cd $dataRepo &&git add . ";
 
         $command .= " && git -c 'user.name=telotawebdev' -c 'user.email=none@bbaw.de'";
-        $command .= " commit -m '$event->user: $event->sourcePath'";
+        $command .= " commit -m 'Webdav Change: $event->sourcePath'";
 
         $result = Process::run($command);
 

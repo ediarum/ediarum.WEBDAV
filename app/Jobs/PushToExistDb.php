@@ -42,10 +42,6 @@ class PushToExistDb implements ShouldQueue
             $status = $res->status();
             $body = $res->body();
             $json = $res->json();
-            Log::info($status);
-            Log::info($body);
-            Log::info($json);
-            Log::info($res);
             throw new HttpResponse("Request to $url with status $status and response $body.");
         }
     }
@@ -55,11 +51,7 @@ class PushToExistDb implements ShouldQueue
 
         $dataFolder = $this->project->data_folder_location;
 
-        Log::info("Putting file: $path in folder $dataFolder");
-
         $content = File::get(rtrim($dataFolder, "/") . "/" . $path);
-        Log::info("Content: $content");
-        Log::info("Encoding:" . mb_check_encoding($content));
         $res = $httpClient
             ->withOptions(['debug' => true])
             ->contentType('application/xml')
@@ -83,7 +75,6 @@ class PushToExistDb implements ShouldQueue
         $baseUrl = rtrim($this->project->exist_base_url, "/");
         $dataPath = trim($this->project->exist_data_path, "/");
         $url = implode("/", [$baseUrl, "rest", $dataPath]);
-        Log::info("Here is the url: $url");
         $httpClient = Http::withBasicAuth($this->project->exist_username, $this->project->exist_password)
             ->baseUrl($url);
 
