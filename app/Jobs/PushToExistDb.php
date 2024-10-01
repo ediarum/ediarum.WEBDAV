@@ -53,8 +53,9 @@ class PushToExistDb implements ShouldQueue
 
         $content = File::get(rtrim($dataFolder, "/") . "/" . $path);
         $res = $httpClient
-            ->withOptions(['debug' => true])
-            ->contentType('application/xml')
+            ->withOptions(['debug' => true, 'headers' => [
+                'Content-Type' => 'application/xml'
+            ]])
             ->withBody($content)
             ->put($path);
         $this->handleRes($res);
