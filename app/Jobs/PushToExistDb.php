@@ -50,7 +50,7 @@ class PushToExistDb implements ShouldQueue
 
         $dataFolder = $this->project->data_folder_location;
 
-        $content = File::get(rtrim($dataFolder, "/") . "/" . $path);
+        $content = File::get(realpath($dataFolder) . "/" . $path);
         $res = $httpClient
             ->withOptions(['debug' => true])
             ->withBody($content, "application/xml")
@@ -60,8 +60,34 @@ class PushToExistDb implements ShouldQueue
 
     private function deletePath(PendingRequest $httpClient, $path)
     {
-        $res = $httpClient->delete($path);
+        $res = $httpClient
+            ->withOptions(['debug' => true])
+            ->delete($path);
         $this->handleRes($res);
+    }
+
+    private function putMovedFiles(PendingRequest $httpClient, $path)
+    {
+        $dataFolder = realpath($this->project->data_folder_location);
+        $newNode = realpath($dataFolder) . "/" . $path;
+
+        if (File::isFile($newNode)) {
+            Log::debug("Moving single file: $path");
+            $this->putFile($httpClient, $path);
+            return;
+        }
+
+        $files = File::allFiles($newNode);
+
+        foreach ($files as $f) {
+            Log::debug("Move file from directory move $path: $f");
+            $relativePath = substr($f->getRealPath(), strlen($dataFolder));
+            Log::debug("Here is the file to push: $relativePath");
+            $this->putFile($httpClient, $relativePath);
+
+        }
+
+
     }
 
     /**
@@ -78,13 +104,18 @@ class PushToExistDb implements ShouldQueue
 
         switch ($this->webDavEvent) {
             case "afterCreateFile":
+                Log::debug("Request to create File: {$this->sourcePath}");
             case "afterWriteContent":
+                Log::debug("Request to write content: {$this->sourcePath}");
                 $this->putFile($httpClient, $this->sourcePath);
                 break;
             case "afterMove":
-                //TODO
+                Log::debug("Detected move from {$this->sourcePath} to {$this->destinationPath}.");
+                Log::debug("Creating {$this->destinationPath}");
+                $this->putMovedFiles($httpClient, $this->destinationPath);
                 break;
             case "afterUnbind":
+                Log::debug("Request to delete: {$this->sourcePath}");
                 $this->deletePath($httpClient, $this->sourcePath);
                 break;
             default:

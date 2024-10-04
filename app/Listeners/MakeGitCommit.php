@@ -24,6 +24,10 @@ class MakeGitCommit
      */
     public function handle(DataChange $event): void
     {
+        // The git commit is taken care of by the delete event when files are moved.
+        if ($event->webDavEvent == "afterMove") {
+            return;
+        }
         Log::info("Making git commit from {$event->user} for {$event->sourcePath}.");
 
         $dataRepo = $event->project->data_folder_location;
@@ -45,8 +49,9 @@ class MakeGitCommit
         }
 
         if ($result->failed()) {
-            Log::error($result->errorOutput());
-
+            Log::error("Git command failed. Error Output: "
+                . $result->errorOutput()
+                . ".Standard output: {$result->output()}");
         }
 
 
