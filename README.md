@@ -1,4 +1,4 @@
-# Ediarum Webdav
+# ediarum.WEBDAV
 
 ## Description
 
@@ -71,4 +71,12 @@ Generate a key: `php8.1 artisan key:generate`
 ### Pushing to Gitlab
 
 If one sets up a project with Gitlab remote url, Gitlab username, and Gitlab Personal Access Token (PAT), then all new commits are automatically pushed to gitlab.
+
+## License
+
+ediarum.WEBDAV is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+ediarum.WEBDAV is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+A copy of the GNU General Public License as found on http://www.gnu.org/licenses/ is included in this repository.
 
