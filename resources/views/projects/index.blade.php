@@ -3,11 +3,11 @@
         Projects
     </x-slot>
 
-    <x-primary-button>
-        <a href="{{route('projects.create')}}">
+    <a href="{{route('projects.create')}}">
+        <x-primary-button>
             Create New Project
-        </a>
-    </x-primary-button>
+        </x-primary-button>
+    </a>
     @foreach($projects as $project)
         <a class='block' href="{{route('projects.show',["project"=>$project->id])}}">
             <x-block>

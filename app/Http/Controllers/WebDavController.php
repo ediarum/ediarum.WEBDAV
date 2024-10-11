@@ -37,7 +37,7 @@ class WebDavController extends Controller
 
         $rootDirectory = new DAV\FS\Directory($project->data_folder_location);
         $server = new DAV\Server($rootDirectory);
-        $server->debugExceptions = true;
+        $server->debugExceptions = config('app.debug');
 
         $sapi = new Sapi();
         $server->sapi = $sapi;
@@ -65,11 +65,11 @@ class WebDavController extends Controller
 
         $server->addPlugin(new DAV\Browser\Plugin());
 
-        $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-            $lock->owner = $request->user()->email;
+        $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($project, $request) {
+            $lock->owner = $project->id . ":" . $request->user()->email;
         });
-        $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
-            $lock->owner = $request->user()->email;
+        $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($project, $request) {
+            $lock->owner = $project->id . ":" . $request->user()->email;
         });
 
         $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];

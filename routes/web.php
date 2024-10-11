@@ -69,6 +69,7 @@ Route::middleware(['auth', 'can:manage-users'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::post('/project-user', [ProjectUserController::class, 'attach'])->name('projects.add-user');
     Route::delete('/project-user', [ProjectUserController::class, 'detach'])->name('projects.remove-user');
+    Route::delete('/project/{projectId}/lock/{lockId}', [ProjectController::class, 'removeLock'])->name('projects.remove-lock');
 });
 
 Route::any('/webdav/{projectSlug}/{path?}', WebDavController::class)

@@ -47,4 +47,50 @@
         @endforeach
         <livewire:add-user :$users/>
     </x-block>
+    <x-block>
+        <h2 class="text-xl py-4">Webdav Locks</h2>
+        <p class="text-sm mb-4">(Warning: Unlocking a file by force will generate an error when the user tries to save that file.)</p>
+        <table class="w-full border-separate">
+            <thead class="text-left">
+            <tr>
+                <th>Owner</th>
+                <th>File</th>
+                <th>Locked Since</th>
+                <th>Locked Time</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($locks as $lock)
+                <tr>
+                    <td class="border">
+                        {{$lock['owner']}}
+                    </td>
+                    <td class="border">
+                        {{$lock['file']}}
+                    </td>
+                    <td class="border">
+                        {{$lock['created']}}
+                    </td>
+                    <td class="border">
+                        {{$lock['timeElapsed']}}
+                    </td>
+                    <td>
+                        <form method="POST"
+                              action="{{ route('projects.remove-lock',["projectId"=>$project->id, "lockId"=>$lock['id']]) }}">
+                            @csrf
+                            @method('DELETE')
+                            <x-primary-button>Force Unlock</x-primary-button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        @if(sizeof($locks) == 0)
+            <div class="w-full text-center">
+                (No Locks)
+            </div>
+        @endif
+    </x-block>
 </x-app-layout>

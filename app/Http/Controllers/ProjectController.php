@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
+use App\Models\Lock;
 use App\Models\Project;
 use App\Models\User;
+use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ProjectController extends Controller
 {
@@ -43,7 +46,7 @@ class ProjectController extends Controller
         $project = new Project();
         $project->fill($validated);
         $project->save();
-        return redirect()->route("projects.show", ["project"=>$project->id]);
+        return redirect()->route("projects.show", ["project" => $project->id]);
 
     }
 
@@ -62,6 +65,18 @@ class ProjectController extends Controller
         $gitlab = $p->gitlab_url && $p->gitlab_username && $p->gitlab_personal_access_token;
         $ediarum = $p->ediarum_backend_url && $p->ediarum_backend_api_key;
         $exist = $p->exist_base_url && $p->exist_data_path && $p->exist_username && $p->exist_password;
+        $locks = Lock::where('owner', 'like', "$id:%")
+            ->orderBy('created')
+            ->get()
+            ->map(function ($l) {
+                $lock['id'] = $l->id;
+                $lock['created'] = Carbon::createFromTimestampUTC($l->created)->setTimezone(config('app.timezone'));
+                $lock['timeElapsed'] = CarbonInterval::seconds(time() - $l->created)->cascade()->forHumans();
+                $lock['owner'] = trim(substr($l->owner, strpos($l->owner, ":") + 1));
+                $lock['file'] = $l->uri;
+                return $lock;
+
+            });
 
 
         return view('projects.show', [
@@ -70,6 +85,7 @@ class ProjectController extends Controller
             "gitlab_push" => $gitlab,
             "ediarum_push" => $ediarum,
             "exist_push" => $exist,
+            "locks" => $locks,
         ]);
     }
 
@@ -93,7 +109,7 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $project->fill($validated);
         $project->save();
-        return redirect()->route("projects.show", ["project"=>$project->id]);
+        return redirect()->route("projects.show", ["project" => $project->id]);
     }
 
     /**
@@ -102,5 +118,13 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function removeLock(int $projectId, int $lockId)
+    {
+        $lock = Lock::find($lockId);
+        $lock->delete();
+        return redirect()->route("projects.show", ["project" => $projectId]);
+
     }
 }
