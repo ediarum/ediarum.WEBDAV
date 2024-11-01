@@ -10,11 +10,11 @@
         </div>
     @endif
 
-    <x-primary-button>
-        <a href="{{route('register')}}">
+    <a href="{{route('register')}}">
+        <x-primary-button>
             Create New User
-        </a>
-    </x-primary-button>
+        </x-primary-button>
+    </a>
     @foreach($users as $user)
         <x-block>
             Name: {{$user->name}}, Email: {{$user->email}}

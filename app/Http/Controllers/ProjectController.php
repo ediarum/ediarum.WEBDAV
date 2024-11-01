@@ -60,7 +60,9 @@ class ProjectController extends Controller
         $users = User::whereDoesntHave('projects',
             function (Builder $q) use ($id) {
                 $q->where('project_id', $id);
-            })->get();
+            })
+            ->orderBy("name")
+            ->get();
 
         $gitlab = $p->gitlab_url && $p->gitlab_username && $p->gitlab_personal_access_token;
         $ediarum = $p->ediarum_backend_url && $p->ediarum_backend_api_key;

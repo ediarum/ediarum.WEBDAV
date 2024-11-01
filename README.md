@@ -26,7 +26,7 @@ It includes the following features:
 * Install php dependencies with `composer install`
 * Install frontend dependencies with `npm install`
 * Start laravel server: `php artisan serve`
-* Start the queue: `php artisan queue:work --queue=default,gitlab,ediarum-backend,exist-db`
+* Start the queue: `php artisan queue:listen --queue=default,gitlab,ediarum-backend,exist-db`
 * Compile frontend assets `npm run serve`
 
 ### Setting up the Database
