@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
+use App\Models\FailedJob;
 use App\Models\Lock;
 use App\Models\Project;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -80,6 +82,25 @@ class ProjectController extends Controller
 
             });
 
+        $failedJobs = FailedJob::all()
+            ->filter(function ($job) use ($p) {
+                if($job->queue !== "exist-db"){
+                    return false;
+                }
+                $payload = json_decode($job->payload);
+                $data = unserialize( $payload->data->command );
+                return $data->project->id == $p->id;
+            })->map(function ($job) {
+                $payload = json_decode($job->payload);
+                $data = unserialize( $payload->data->command );
+                return [
+                    "uuid" => $payload->uuid,
+                    "file" => $data->sourcePath,
+                    "time" => $job->failed_at,
+                ];
+            });
+
+
 
         return view('projects.show', [
             "project" => $p,
@@ -88,6 +109,7 @@ class ProjectController extends Controller
             "ediarum_push" => $ediarum,
             "exist_push" => $exist,
             "locks" => $locks,
+            "failed_jobs" => $failedJobs,
         ]);
     }
 

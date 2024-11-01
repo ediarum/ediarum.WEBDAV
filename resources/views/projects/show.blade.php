@@ -49,7 +49,8 @@
     </x-block>
     <x-block>
         <h2 class="text-xl py-4">Webdav Locks</h2>
-        <p class="text-sm mb-4">(Warning: Unlocking a file by force will generate an error when the user tries to save that file.)</p>
+        <p class="text-sm mb-4">(Warning: Unlocking a file by force will generate an error when the user tries to save
+            that file.)</p>
         <table class="w-full border-separate">
             <thead class="text-left">
             <tr>
@@ -93,4 +94,18 @@
             </div>
         @endif
     </x-block>
+    @if($exist_push)
+        <x-block>
+            <h2 class="text-xl py-4">Failed Pushes to Existdb</h2>
+            @foreach($failed_jobs as $f)
+                Failed at: {{ $f['time'] }}. File(s): {{ $f["file"] }}.
+            @endforeach
+            @if(sizeof($failed_jobs) == 0)
+                <div class="w-full text-center">
+                    (No Failed Pushes to ExistDB)
+                </div>
+            @endif
+
+        </x-block>
+    @endif
 </x-app-layout>
