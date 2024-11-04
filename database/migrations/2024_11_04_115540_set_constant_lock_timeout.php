@@ -27,6 +27,5 @@ return new class extends Migration
     public function down(): void
     {
         DB::unprepared('DROP TRIGGER IF EXISTS set_timeout_before_lock_insert');
-        //
     }
 };
