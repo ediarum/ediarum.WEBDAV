@@ -65,6 +65,14 @@ class WebDavController extends Controller
 
         $server->addPlugin(new DAV\Browser\Plugin());
 
+        if($request->method() === "LOCK"){
+            Log::debug("Lock Request If Header: " . $request->header('If'));
+            Log::debug("Lock Request Body: " . $request->getContent());
+        }
+        if($request->method() === "PUT"){
+            Log::debug("PUT Request If Header: " . $request->header('If'));
+        }
+
         $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($project, $request) {
             $lock->owner = $project->id . ":" . $request->user()->email;
         });
