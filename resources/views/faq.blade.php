@@ -5,7 +5,7 @@
 
     <x-block>
         <div class="prose max-w-none">
-            {!!  \Illuminate\Support\Str::markdown(file_get_contents(resource_path('markdown/faq.md'))) !!}
+            {!! $markdown !!}
         </div>
     </x-block>
 

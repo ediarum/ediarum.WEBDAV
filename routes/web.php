@@ -47,7 +47,17 @@ if (env('APP_ENV') == 'production') {
     \Illuminate\Support\Facades\URL::forceScheme("https");
 }
 Route::get('/faq', function () {
-    return view('faq');
+    $content = file_get_contents(resource_path('markdown/faq.md'));
+
+// Replace relative image paths with the full path using the `asset()` function
+    $subpathMarkdown = preg_replace(
+        '/\((\/images\/[^\)]+)\)/',
+        '(' . asset('$1') . ')',
+        $content
+    );
+
+    $markdown =  Str::markdown($subpathMarkdown);
+    return view('faq', ["markdown"=>$markdown]);
 })->name('faq');
 
 Route::get('/', function () {
