@@ -46,6 +46,9 @@ Router::$verbs = array_merge(Router::$verbs, $verbs);
 if (env('APP_ENV') == 'production') {
     \Illuminate\Support\Facades\URL::forceScheme("https");
 }
+Route::get('/faq', function () {
+    return view('faq');
+})->name('faq');
 
 Route::get('/', function () {
     return view('auth.login');

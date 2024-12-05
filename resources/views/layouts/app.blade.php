@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Ediarum WebDAV') }}</title>
     <link rel="icon" type="image/x-icon" href="/favicon.png">
 
     <!-- Scripts -->
@@ -13,7 +13,9 @@
 </head>
 <body class="font-sans antialiased">
 <div class="min-h-screen bg-ediarum-gray">
-    @include('layouts.navigation')
+    @if((auth()->user()))
+        @include('layouts.navigation')
+    @endif
 
     <!-- Page Heading -->
     @if (isset($header))
