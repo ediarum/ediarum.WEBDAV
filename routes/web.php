@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectServicesController;
 use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WebDavController;
@@ -56,13 +57,14 @@ Route::get('/faq', function () {
         $content
     );
 
-    $markdown =  Str::markdown($subpathMarkdown);
-    return view('faq', ["markdown"=>$markdown]);
+    $markdown = Str::markdown($subpathMarkdown);
+    return view('faq', ["markdown" => $markdown]);
 })->name('faq');
 
 Route::get('/', function () {
     return view('auth.login');
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -83,9 +85,16 @@ Route::middleware(['auth', 'can:manage-users'])->group(function () {
     Route::post('/project-user', [ProjectUserController::class, 'attach'])->name('projects.add-user');
     Route::delete('/project-user', [ProjectUserController::class, 'detach'])->name('projects.remove-user');
     Route::delete('/project/{projectId}/lock/{lockId}', [ProjectController::class, 'removeLock'])->name('projects.remove-lock');
+
+    Route::get('/project/{projectId}/push-to-existdb', [ProjectServicesController::class, 'pushFilesToExistDb'])
+        ->name('projects.push-to-existdb');
+    Route::post('/project/{projectId}/enable-maintenances-mode', [ProjectServicesController::class, 'enableMaintenanceMode'])
+        ->name('projects.enable-maintenance-mode');
+    Route::post('/project/{projectId}/disable-maintenances-mode', [ProjectServicesController::class, 'disableMaintenanceMode'])
+        ->name('projects.disable-maintenance-mode');
 });
 
-Route::any('/webdav/{projectSlug}/{path?}', WebDavController::class)
+Route::any('/connection/{projectSlug}/{path?}', WebDavController::class)
     ->where('path', '(.)*')
     ->middleware(['auth.basic', 'webdav.proxy.propfind', 'webdav.proxy.destination']);
 

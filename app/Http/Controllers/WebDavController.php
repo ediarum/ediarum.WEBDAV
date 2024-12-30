@@ -31,6 +31,11 @@ class WebDavController extends Controller
             abort(403);
         }
 
+        if($project->is_in_maintenance_mode){
+            abort(503, "The project {$project->name} is currently locked due to a data transformation in progress.
+            Please try again later.");
+        }
+
         $rootDirectory = new DAV\FS\Directory($project->data_folder_location);
         $server = new DAV\Server($rootDirectory);
         $server->debugExceptions = config('app.debug');
@@ -38,7 +43,7 @@ class WebDavController extends Controller
         $sapi = new Sapi();
         $server->sapi = $sapi;
 
-        $server->setBaseUri(env("APP_SUBPATH") . '/webdav/' . $request->projectSlug);
+        $server->setBaseUri(env("APP_SUBPATH") . '/connection/' . $request->projectSlug);
         $server->setLogger(Log::getLogger());
 
         //Note sure why errors are not getting logged...

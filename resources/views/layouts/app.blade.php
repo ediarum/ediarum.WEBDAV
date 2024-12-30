@@ -32,6 +32,11 @@
     <main>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                @if($errors->any())
+                @foreach($errors->all() as $e)
+                    <p class="bg-red-600 text-white text-xl">{{$e}}</p>
+                @endforeach
+                @endif
                 {{ $slot }}
             </div>
         </div>
