@@ -78,5 +78,4 @@ ediarum.WEBDAV is free software: you can redistribute it and/or modify it under 
 
 ediarum.WEBDAV is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-A copy of the GNU General Public License as found on http://www.gnu.org/licenses/ is included in this repository.
-
+You should have received a copy of the GNU General Public License along with ediarum.DB If not, see http://www.gnu.org/licenses/.
