@@ -87,6 +87,6 @@ Route::middleware(['auth', 'can:manage-users'])->group(function () {
 
 Route::any('/webdav/{projectSlug}/{path?}', WebDavController::class)
     ->where('path', '(.)*')
-    ->middleware('auth.basic');
+    ->middleware(['auth.basic', 'webdav.proxy']);
 
 require __DIR__ . '/auth.php';
