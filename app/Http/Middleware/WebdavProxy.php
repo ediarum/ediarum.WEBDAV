@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebdavProxy
@@ -20,7 +21,7 @@ class WebdavProxy
             // Only proceed if it's a response with content and content-type is XML or HTML-ish
             if (! $response->isSuccessful()) {
                 return $response;
-            }
+	    }
 
             $contentType = $response->headers->get('Content-Type', '');
 
@@ -34,16 +35,20 @@ class WebdavProxy
                 return $response;
             }
 
+	    
+	    //Log::info('Webdav Proxy' . $proxyRoot);
+
             $content = $response->getContent();
 
             $appUrl = config('app.url');
             $appSubpath = parse_url($appUrl, PHP_URL_PATH) ?: '/';
-            $backendRoot = $appSubpath . 'webdav';
+            $backendRoot = rtrim($appSubpath, "/") . '/webdav';
 
             // Normalize trailing slashes (remove trailing slash for consistency)
             $proxyRoot = rtrim($proxyRoot, '/');
             $backendRoot = rtrim($backendRoot, '/');
 
+	    //Log::info('Doing a find replace for'. $backendRoot ."and proxy" . $proxyRoot);
             // Replace href URLs in <d:href> elements:
             // e.g. <d:href>/ediarum-webdav/webdav/something</d:href>
             // becomes <d:href>/webdav/connection/something</d:href>
