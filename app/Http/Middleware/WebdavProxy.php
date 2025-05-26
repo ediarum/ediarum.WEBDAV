@@ -19,7 +19,7 @@ class WebdavProxy
             $response = $next($request);
 
             // Only proceed if it's a response with content and content-type is XML or HTML-ish
-            if (! $response->isSuccessful()) {
+            if (! $response->isSuccessful() || $request->method() !== 'PROPFIND') {
                 return $response;
 	    }
 
