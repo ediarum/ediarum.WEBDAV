@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'webdav.proxy' => \App\Http\Middleware\WebdavProxy::class,
+        'webdav.proxypropfind' => \App\Http\Middleware\WebdavProxyPropFind::class,
+        'webdav.proxydestination' => \App\Http\Middleware\WebdavProxyDestination::class,
     ];
 }

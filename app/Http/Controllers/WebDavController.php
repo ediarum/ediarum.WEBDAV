@@ -45,14 +45,6 @@ class WebDavController extends Controller
         $server->setBaseUri(env("APP_SUBPATH") . '/webdav/' . $request->projectSlug);
         $server->setLogger(Log::getLogger());
 
-        //Not sure if this is necessary...
-//        $query = $request->getQueryString();
-//        $url = Str::finish($request->getPathInfo(), '/');
-//
-//        $fullPath = is_null($query) ? $url : $url.'?'.$query;
-//
-//        $server->httpRequest->setUrl($fullPath);
-
         //Note sure why errors are not getting logged...
         if (!Storage::disk('local')->exists('webdav-locks')) {
             Storage::disk('local')->makeDirectory('webdav-locks');
