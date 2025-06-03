@@ -28,7 +28,11 @@ class PushDataChanges
     {
         $project = $event->project;
         if ($project->ediarum_backend_url && $project->ediarum_backend_api_key) {
-            PushToEdiarumBackend::dispatch($project
+            PushToEdiarumBackend::dispatch(
+                $event->project,
+                $event->webDavEvent,
+                $event->sourcePath,
+                $event->destinationPath,
             )->onQueue('ediarum-backend');
         }
         if ($project->exist_base_url

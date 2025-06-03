@@ -2,12 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Events\DataChange;
 use App\Exceptions\HttpResponse;
 use App\Exceptions\UnknownWebDavHook;
 use App\Models\Project;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Client\PendingRequest;
@@ -21,51 +19,53 @@ class PushToEdiarumBackend implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private PendingRequest $httpClient;
     private string $url;
+
     /**
      * Create a new job instance.
      */
     public function __construct(
-        public DataChange $change
+        public Project $project,
+        public string  $webDavEvent,
+        public string  $sourcePath,
+        public ?string $destinationPath = null,
     )
     {
-        $this->url = $this->change->project->ediarum_backend_url;
-        $this->httpClient = Http::withToken($this->change->project->ediarum_backend_api_key);
+        $this->url = $this->project->ediarum_backend_url;
     }
+
     private function handleRes(Response $res)
     {
         if ($res->failed()) {
             $status = $res->status();
             $body = $res->body();
             throw new HttpResponse("Request to Ediarum Backend failed with status $status and response $body");
+        } else {
+            Log::debug("Request to " . $res->effectiveUri() . "successful: " . $res->body());
         }
     }
 
-    private function createFile($path)
+    private function pushFile($path)
     {
-        $res = $this->httpClient->post($this->url, ['path' => $path]);
+        $absolute_path = $this->project->data_folder_location . "/" . $path;
+        $res = Http::withToken($this->project->ediarum_backend_api_key)
+            ->attach('file', file_get_contents($absolute_path), $path)
+            ->attach('path', $path)
+            ->post($this->url . "/files");
+
         $this->handleRes($res);
     }
 
-    private function editFile($path)
-    {
-        $res = $this->httpClient->put($this->url, ['path' => $path]);
-        $this->handleRes($res);
-    }
-
+    //TODO: Implement this
     private function movePath($source, $destination)
     {
-        $res = $this->httpClient->put($this->url . "move", [
-            'source_path' => $source,
-            'destination_path' => $destination,
-        ]);
-        $this->handleRes($res);
     }
 
     private function deletePath($path)
     {
-        $res = $this->httpClient->delete($this->url, ['path' => $path]);
+
+        $res = Http::withToken($this->project->ediarum_backend_api_key)
+            ->delete($this->url . "/files", ['path' => $path]);
         $this->handleRes($res);
     }
 
@@ -75,23 +75,22 @@ class PushToEdiarumBackend implements ShouldQueue
      */
     public function handle(): void
     {
-
-            switch ($this->change->webDavEvent) {
-                case "afterCreateFile":
-                    $this->createFile($this->change->sourcePath);
-                    break;
-                case "afterWriteContent":
-                    $this->editFile($this->change->sourcePath);
-                    break;
-                case "afterMove":
-                    $this->movePath($this->change->sourcePath, $this->change->destinationPath);
-                    break;
-                case "afterUnbind":
-                    $this->deletePath($this->change->sourcePath);
-                    break;
-                default:
-                    throw new UnknownWebDavHook($this->change->webDavEvent);
-            }
+        switch ($this->webDavEvent) {
+            case "afterCreateFile":
+                $this->pushFile($this->sourcePath);
+                break;
+            case "afterWriteContent":
+                $this->pushFile($this->sourcePath);
+                break;
+            case "afterMove":
+                $this->movePath($this->sourcePath, $this->destinationPath);
+                break;
+            case "afterUnbind":
+                $this->deletePath($this->sourcePath);
+                break;
+            default:
+                throw new UnknownWebDavHook($this->webDavEvent);
+        }
 
     }
 }
