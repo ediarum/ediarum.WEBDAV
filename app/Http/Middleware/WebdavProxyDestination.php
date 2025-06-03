@@ -17,6 +17,7 @@ class WebdavProxyDestination
      */
     public function handle(Request $request, Closure $next): Response
     {
+
         $proxyRoot = $request->header('X-WebDAV-Proxy-Root');
 
         if ($request->hasHeader('Destination') && $proxyRoot) {
@@ -33,11 +34,11 @@ class WebdavProxyDestination
 
             Log::info("Replacing $proxyRoot with $backendRoot in Destination header");
 
-            $rewritten = Str::replaceFirst($originalDestination, $proxyRoot, $backendRoot);
+            $rewritten = Str::replaceFirst($proxyRoot, $backendRoot, $originalDestination);
             Log::info("Setting Rewritten Destination: " . $rewritten);
 
             // Replace the header in the Symfony request object
-            $request->headers->set('Destination', $rewritten);
+            $_SERVER['HTTP_DESTINATION'] = $rewritten;
         }
 
         return $next($request);
