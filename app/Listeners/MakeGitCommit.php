@@ -49,12 +49,10 @@ class MakeGitCommit
         }
 
         if ($result->failed()) {
-            Log::error("Git command failed. Error Output: "
+            Log::error("Git command failed for project {$event->project->name}. Error Output: '"
                 . $result->errorOutput()
-                . ".Standard output: {$result->output()}");
+                . "'.Standard output: {$result->output()}");
         }
 
-
-        //
     }
 }
