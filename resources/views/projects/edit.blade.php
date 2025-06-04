@@ -26,13 +26,13 @@
             <x-input-standard id="gitlab_username" description="Gitlab Username"
                               :value="$project->gitlab_username"
             />
-            <x-input-standard id="gitlab_personal_access_token" description="Gitlab PAT" :hidden="true"
+            <x-input-secret id="gitlab_personal_access_token" description="Gitlab PAT" :hidden="true"
                               :value="$project->gitlab_personal_access_token"
             />
             <x-input-standard id="ediarum_backend_url" description="Ediarum Backend Url"
                               :value="$project->ediarum_backend_url"
             />
-            <x-input-standard id="ediarum_backend_api_key" description="Ediarum Backend Api Key" :hidden="true"
+            <x-input-secret id="ediarum_backend_api_key" description="Ediarum Backend Api Key" :hidden="true"
                               :value="$project->ediarum_backend_api_key"
             />
             <x-input-standard id="exist_base_url" description="eXist-db Base Url"
@@ -44,7 +44,7 @@
             <x-input-standard id="exist_username" description="eXist-db Username"
                               :value="$project->exist_username"
             />
-            <x-input-standard id="exist_password" description="eXist-db Password" :hidden="true"
+            <x-input-secret id="exist_password" description="eXist-db Password" :hidden="true"
                               :value="$project->exist_password"
             />
 

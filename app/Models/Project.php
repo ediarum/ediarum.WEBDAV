@@ -16,13 +16,10 @@ class Project extends Model
         'data_folder_location',
         'gitlab_url',
         'gitlab_username',
-        'gitlab_personal_access_token',
         'ediarum_backend_url',
-        'ediarum_backend_api_key',
         'exist_base_url',
         'exist_data_path',
         'exist_username',
-        'exist_password',
     ];
 
     /**

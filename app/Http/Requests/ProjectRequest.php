@@ -31,12 +31,15 @@ class ProjectRequest extends FormRequest
             'gitlab_url' => 'nullable',
             'gitlab_username' => 'nullable',
             'gitlab_personal_access_token' => 'nullable',
+            'gitlab_personal_access_token_delete' => 'nullable',
             'ediarum_backend_url' => 'nullable',
             'ediarum_backend_api_key' => 'nullable',
+            'ediarum_backend_api_key_delete' => 'nullable',
             'exist_base_url' => 'nullable',
             'exist_data_path' => 'nullable',
             'exist_username' => 'nullable',
             'exist_password' => 'nullable',
+            'exist_password_delete' => 'nullable',
         ];
     }
 }

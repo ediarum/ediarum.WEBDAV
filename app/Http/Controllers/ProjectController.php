@@ -33,9 +33,7 @@ class ProjectController extends Controller
         return view('projects.edit', [
             "project" => new Project(),
             "new" => true,
-
         ]);
-        //
     }
 
     /**
@@ -79,7 +77,6 @@ class ProjectController extends Controller
                 $lock['owner'] = trim(substr($l->owner, strpos($l->owner, ":") + 1));
                 $lock['file'] = $l->uri;
                 return $lock;
-
             });
 
         $failedJobs = FailedJob::all()
@@ -132,6 +129,16 @@ class ProjectController extends Controller
         $validated = $request->validated();
         $project = Project::findOrFail($id);
         $project->fill($validated);
+
+        foreach($project->getHidden() as $h){
+            if(isset($validated[$h])){
+                $project->{$h} = $validated[$h];
+            }
+            else if ( $request->boolean($h . "_delete") ) {
+                $project->{$h} = null;
+            }
+        }
+
         $project->save();
         return redirect()->route("projects.show", ["project" => $project->id]);
     }

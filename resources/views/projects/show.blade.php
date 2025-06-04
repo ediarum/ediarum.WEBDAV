@@ -99,6 +99,7 @@
             <h2 class="text-xl py-4">Failed Pushes to Existdb</h2>
             @foreach($failed_jobs as $f)
                 Failed at: {{ $f['time'] }}. File(s): {{ $f["file"] }}.
+                <br>
             @endforeach
             @if(sizeof($failed_jobs) == 0)
                 <div class="w-full text-center">
