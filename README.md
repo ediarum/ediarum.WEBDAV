@@ -64,9 +64,36 @@ stdout_logfile=/path_to_ediarum.webdav/storage/logs/queue.log
 stopwaitsecs=3600
 ```
 
+Make sure to set up a cronjob for the scheduler:
+```
+php8.1 /path_to_ediarum.webdav/artisan schedule:run >> /dev/null 2>&1 
+```
+
+Finally, we are experimenting with pruning failed jobs. If we decide to do this, this will be integrated into the schedule.
+At the moment it has to be manually run:
+```
+php8.1 /path_to_ediarum.webdav/artisan queue:prune-failed
+```
+
 ### And the server specific commands:
 `npm run build`
 Generate a key: `php8.1 artisan key:generate`
+
+
+### Proxying
+
+If you want users to access the webdav service via a different url, you can use the following nginx configuration to set up a reverse proxy:
+```
+location /your/desired/base/webdav/uri {
+	proxy_pass https://actualwebaddress.com/webdav/;
+    proxy_set_header X-WebDAV-Proxy-Root "/your/desired/base/webdav/uri";
+
+}
+```
+Now, users can access the webdav service via `https://somedomain.com/your/desired/base/webdav/uri`, although it is proxied to
+`https://actualwebaddress.com/webdav/`.
+
+Middleware picks up the `X-WebDAV-Proxy-Root` header and modifies the Webdav Requests and Responses as needed.
 
 ### Pushing to Gitlab
 
