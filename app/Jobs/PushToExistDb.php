@@ -49,11 +49,16 @@ class PushToExistDb implements ShouldQueue
     {
 
         $dataFolder = $this->project->data_folder_location;
-
-        $content = File::get(realpath($dataFolder) . "/" . $path);
+        $fullPath  = realpath($dataFolder) . "/" . $path;
+        $mimeType = File::mimeType($fullPath);
+        if($mimeType === "text/xml"){
+            $mimeType = "application/xml";
+        }
+        Log::debug("Pushing file to eXist-db: $path with ContentType $mimeType." );
+        $content = File::get($fullPath);
         $res = $httpClient
             ->withOptions(['debug' => true])
-            ->withBody($content, "application/xml")
+            ->withBody($content, $mimeType)
             ->put($path);
         $this->handleRes($res);
     }
