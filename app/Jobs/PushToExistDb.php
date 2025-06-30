@@ -45,16 +45,31 @@ class PushToExistDb implements ShouldQueue
         }
     }
 
+    public static function setMimeType($full_file_path) : string
+    {
+        $extension = strtolower(pathinfo($full_file_path, PATHINFO_EXTENSION));
+
+        $overrideMap = [
+            'xml'  => 'application/xml',
+            'html' => 'text/html',
+            'json' => 'application/json',
+            'jpeg' => 'image/jpeg',
+        ];
+
+        if (array_key_exists($extension, $overrideMap)) {
+            return $overrideMap[$extension];
+        }
+
+        return File::mimeType($full_file_path);
+    }
+
     private function putFile(PendingRequest $httpClient, $path)
     {
 
         $dataFolder = $this->project->data_folder_location;
-        $fullPath  = realpath($dataFolder) . "/" . $path;
-        $mimeType = File::mimeType($fullPath);
-        if($mimeType === "text/xml"){
-            $mimeType = "application/xml";
-        }
-        Log::debug("Pushing file to eXist-db: $path with ContentType $mimeType." );
+        $fullPath = realpath($dataFolder) . "/" . $path;
+        $mimeType = self::setMimeType($fullPath);
+        Log::debug("Pushing file to eXist-db: $path with ContentType $mimeType.");
         $content = File::get($fullPath);
         $res = $httpClient
             ->withOptions(['debug' => true])
