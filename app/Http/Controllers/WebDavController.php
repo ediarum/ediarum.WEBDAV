@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Sabre\DAV;
 
 /*
@@ -34,7 +33,6 @@ class WebDavController extends Controller
             abort(403);
         }
 
-
         $rootDirectory = new DAV\FS\Directory($project->data_folder_location);
         $server = new DAV\Server($rootDirectory);
         $server->debugExceptions = config('app.debug');
@@ -51,6 +49,7 @@ class WebDavController extends Controller
         }
         $pdo = DB::getPdo();
         $lockBackend = new DAV\Locks\Backend\PDO($pdo);
+        $lockBackend->tableName = 'locks_' . $project->id;
         $lockPlugin = new DAV\Locks\Plugin($lockBackend);
 
         $server->addPlugin($lockPlugin);
@@ -65,11 +64,13 @@ class WebDavController extends Controller
             Log::debug("PUT Request If Header: " . $request->header('If'));
         }
 
-        $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($project, $request) {
-            $lock->owner = $project->id . ":" . $request->user()->email;
+
+
+        $server->on('beforeLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+            $lock->owner = $request->user()->email;
         });
-        $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($project, $request) {
-            $lock->owner = $project->id . ":" . $request->user()->email;
+        $server->on('beforeUnLock', function ($path, \Sabre\DAV\Locks\LockInfo $lock) use ($request) {
+            $lock->owner = $request->user()->email;
         });
 
         $events = ['afterCreateFile', 'afterWriteContent', 'afterUnbind', 'afterMove',];

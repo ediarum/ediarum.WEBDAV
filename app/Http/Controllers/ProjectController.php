@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\FailedJob;
-use App\Models\Lock;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\LockTableManager;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
@@ -46,6 +47,9 @@ class ProjectController extends Controller
         $project = new Project();
         $project->fill($validated);
         $project->save();
+
+        LockTableManager::ensureTableForProject($project->id);
+
         return redirect()->route("projects.show", ["project" => $project->id]);
 
     }
@@ -67,14 +71,15 @@ class ProjectController extends Controller
         $gitlab = $p->gitlab_url && $p->gitlab_username && $p->gitlab_personal_access_token;
         $ediarum = $p->ediarum_backend_url && $p->ediarum_backend_api_key;
         $exist = $p->exist_base_url && $p->exist_data_path && $p->exist_username && $p->exist_password;
-        $locks = Lock::where('owner', 'like', "$id:%")
+        $locks =
+            DB::table("locks_$id")
             ->orderBy('created')
             ->get()
             ->map(function ($l) {
                 $lock['id'] = $l->id;
                 $lock['created'] = Carbon::createFromTimestampUTC($l->created)->setTimezone(config('app.timezone'));
                 $lock['timeElapsed'] = CarbonInterval::seconds(time() - $l->created)->cascade()->forHumans();
-                $lock['owner'] = trim(substr($l->owner, strpos($l->owner, ":") + 1));
+                $lock['owner'] = $l->owner;
                 $lock['file'] = $l->uri;
                 return $lock;
             });
@@ -153,8 +158,7 @@ class ProjectController extends Controller
 
     public function removeLock(int $projectId, int $lockId)
     {
-        $lock = Lock::find($lockId);
-        $lock->delete();
+        DB::table("locks_$projectId")->where('id',$lockId)->delete();
         return redirect()->route("projects.show", ["project" => $projectId]);
 
     }

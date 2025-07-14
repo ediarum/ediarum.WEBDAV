@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Lock;
+use App\Models\Project;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class IncreaseLockTimeout extends Command
 {
@@ -26,8 +28,21 @@ class IncreaseLockTimeout extends Command
      */
     public function handle()
     {
-        Lock::where("timeout", 1800)
-            ->update(["timeout" => 1000000000]);
-        //
+
+        $projects = Project::get();
+        foreach ($projects as $project)
+        {
+            $table = 'locks_' . $project->id;
+
+            if (!\Schema::hasTable($table)) {
+                $this->error("Table {$table} does not exist. Skipping project ID: {$project->id}");
+                continue;
+            }
+
+            DB::table($table)
+                ->where('timeout', 1800)
+                ->update(['timeout' => 1000000000]);
+        }
+
     }
 }
