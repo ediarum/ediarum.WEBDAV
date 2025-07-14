@@ -8,7 +8,13 @@ It includes the following features:
 * User Management (Create Users, Manage Passwords, Add to Projects)
 * Configure a WevDAV connection to multiple different Projects 
 * When files are edited, the user can push those files to an exist-db 
-* When files are edited, the user can push those files to Ediarum.Backend (soon to be released).
+* When files are edited, the user can push those files to Ediarum.Backend (still in development).
+
+
+### Setting up a project
+
+In order to set up a project where all webdav changes are saved as git commits, it is necessary that the git repository of the project be saved on the server.
+Then, in the settings to the project, the user must enter the absolute path to this repository.
 
 
 ## Local Development with Docker
@@ -44,12 +50,22 @@ Make sure you have set the initial user, email, and password in the `.env` file.
 * Once you have an account, use the email and password you entered to log in to the webdav, located at the `webdav` subroot, so for example: localhost:8000/webdav
 
 ## Deployment
-One can use the docker files as examples if one wants to do a docker deployment, but it is easier and preferable to not use docker.
 
+### PHP Version
 On the server, you need to specify the php version, so:
 `php8.1 /usr/local/bin/composer install`
 `php8.1 artisan migrate:install` etc.
-Make sure to set up the queue with supervisor. The Supervisor file looks something like this:
+
+
+### Nginx
+The applicaiton must be served over nginx or apache.  The file `nginx.conf` shows how to serve the application form a subpath.`` 
+
+### Queue
+
+Pushes to an existdb instance are handled via a queue. 
+
+Set up the queue with supervisor. The Supervisor file looks something like this:
+
 ```
 [program:ediarum-webdav-laravel-queue-worker]
 process_name=%(program_name)s_%(process_num)02d
@@ -64,20 +80,25 @@ stdout_logfile=/path_to_ediarum.webdav/storage/logs/queue.log
 stopwaitsecs=3600
 ```
 
+We are experimenting with pruning failed jobs. If we decide to do this, this will be integrated into the schedule.
+At the moment it has to be manually run:
+
+```
+php8.1 /path_to_ediarum.webdav/artisan queue:prune-failed
+```
+
+### Larvael schedule
+
+The Webdav locking system requires a scheduler to prevent Webdav Locks from expiring.
+
 Make sure to set up a cronjob for the scheduler:
 ```
 php8.1 /path_to_ediarum.webdav/artisan schedule:run >> /dev/null 2>&1 
 ```
 
-Finally, we are experimenting with pruning failed jobs. If we decide to do this, this will be integrated into the schedule.
-At the moment it has to be manually run:
-```
-php8.1 /path_to_ediarum.webdav/artisan queue:prune-failed
-```
-
-### And the server specific commands:
-`npm run build`
-Generate a key: `php8.1 artisan key:generate`
+### Server specific commands:
+* Build the frontend assetss: `npm run build`
+* Generate a Laravel application key: `php8.1 artisan key:generate`
 
 
 ### Proxying
