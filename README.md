@@ -7,6 +7,20 @@ Part of ediarum <https://www.ediarum.org/index.html> (<ediarum@bbaw.de>)
 Developed by TELOTA, a DH working group of the Berlin-Brandenburg Academey of Sciences and Humanities
 <https://www.bbaw.de/telota> (<telota@bbaw.de>)
 
+Ediarum core team:
+
+* Nadine Arndt
+* Martin Fechner
+* Jan Wierzoch
+
+Developer of ediarum.WEBDAV:
+
+* Marcus Lampert
+
+## Cite this Software
+
+If you use this software, please cite it using the metadata in the file CITATION.CFF (for more information about CFF see https://citation-file-format.github.io/).
+
 ## What does it do?
 
 This is an application allows users to edit files over a WevDAV connection and tracks those changes via automatic git commits (file versioning).
