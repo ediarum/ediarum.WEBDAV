@@ -9,3 +9,8 @@ code {
     @apply py-1;
     @apply px-3;
 }
+
+code::before,
+code::after {
+    content: none !important;
+}
