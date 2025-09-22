@@ -13,7 +13,7 @@ Wenn beim Speichern eine Fehlermeldung passiert, dann ist das in der Regel ein P
 
 ### Can I push data transformations or other commits I do locally to ediarum.WEBDAV?
 
-Yes, however there is, so far, so way to do this through the ediarum.WEBDAV management console.
+Yes. However, there is, so far, no way to do this through the ediarum.WEBDAV Management Console.
 
 Here is a way to do it manually.
 
