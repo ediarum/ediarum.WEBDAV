@@ -18,11 +18,10 @@ Yes, however there is, so far, so way to do this through the ediarum.WEBDAV mana
 Here is a way to do it manually.
 
 First do your changes locally:
-
 1. Check out the webdav branch locally on your computer.
 2. Make your changes and commit them locally.
 3. Push your changes to gitlab.
-~~~~
+
 Then, deploy your changes to the server:
  1. ssh into the server telotaweb.bbaw.de
  2. `cd /opt/projects/ediarum.webdav/{your_project_folder}` 
@@ -42,7 +41,7 @@ For projects with a lot of traffic, it is therefore recommended to disable the w
  - pull them to the server.
 
 You can disable the webdav connection by, for example, changing the project slug to {project_slug_disabled}.  During that time, the user will then get a `404 Not Found` when trying to access the webdav.
-~~~~
+
 #### Planned improvements
 A feature is planned whereby developers can deploy data transformations over the Management Console.
 This feature would have:
