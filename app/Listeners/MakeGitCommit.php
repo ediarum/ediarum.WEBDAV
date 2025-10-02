@@ -28,8 +28,6 @@ class MakeGitCommit
         if ($event->webDavEvent == "afterMove") {
             return;
         }
-        Log::info("Making git commit from {$event->user} for {$event->sourcePath}.");
-
         $dataRepo = $event->project->data_folder_location;
 
         $command = "cd $dataRepo &&git add . ";

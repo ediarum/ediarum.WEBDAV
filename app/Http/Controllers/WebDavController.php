@@ -25,8 +25,6 @@ class WebDavController extends Controller
     public function __invoke(Request $request)
     {
 
-        Log::info("Request from " . $request->user()->email . ": " . $request->getMethod() . ": " . $request->fullUrl());
-
         $project = Project::where('slug', $request->projectSlug)->firstOrFail();
 
         if (!Gate::allows('edit-project-files', $project->id)) {
