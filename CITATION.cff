@@ -16,7 +16,7 @@ authors:
 title: ediarum.WEBDAV
 abstract: "ediarum.WEBDAV allows users to edit files over a WebDAV connection and tracks those changes via automatic git commits."
 type: software
-date-released: "2025-09"
+date-released: "2025-10"
 version: 1.0.0
 repository-code: "https://github.com/ediarum/ediarum.WEBDAV"
 license: "GPL-3.0"
