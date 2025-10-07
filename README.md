@@ -1,5 +1,7 @@
 # ediarum.WEBDAV
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17285966.svg)](https://doi.org/10.5281/zenodo.17285966)
+
 © 2025 by Berlin-Brandenburg Academy of Sciences and Humanities
 
 Part of ediarum <https://www.ediarum.org/index.html> (<ediarum@bbaw.de>)
