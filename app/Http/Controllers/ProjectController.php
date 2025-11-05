@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FolderContents;
 use App\Http\Requests\ProjectRequest;
 use App\Models\FailedJob;
 use App\Models\Project;
@@ -22,7 +23,7 @@ class ProjectController extends Controller
     public function index()
     {
         return view('projects.index', [
-            'projects' => Project::all(),
+            'projects' => Project::orderBy('updated_at', 'desc')->get(),
         ]);
     }
 
@@ -46,6 +47,13 @@ class ProjectController extends Controller
         $validated = $request->validated();
         $project = new Project();
         $project->fill($validated);
+
+        foreach($project->getHidden() as $h) {
+            if (isset($validated[$h])) {
+                $project->{$h} = $validated[$h];
+            }
+        }
+        
         $project->save();
 
         LockTableManager::ensureTableForProject($project->id);
@@ -104,6 +112,13 @@ class ProjectController extends Controller
 
 
 
+        $fileSystem = new FolderContents();
+        $fileSystem->parseFileSystemFolderContents(
+            $p->data_folder_location
+        );
+
+
+
         return view('projects.show', [
             "project" => $p,
             "users" => $users,
@@ -111,6 +126,7 @@ class ProjectController extends Controller
             "ediarum_push" => $ediarum,
             "exist_push" => $exist,
             "locks" => $locks,
+            "folders" => $fileSystem->getFolders(),
             "failed_jobs" => $failedJobs,
         ]);
     }

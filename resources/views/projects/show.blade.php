@@ -6,25 +6,70 @@
     <x-block>
         <div class="space-y-3">
 
-            <h2 class="text-xl">Project Details for "{{$project->name}}"</h2>
+            <h2 class="text-xl">Project Settings for "{{$project->name}}"</h2>
             <p>
-                Ediarum Webdav Route: <code>/webdav/{{ $project->slug }}</code>
-            </p>
-            <p>
-                Data Folder: <code>{{$project->data_folder_location}}</code>
-            </p>
-            <p>
-                Pushes to Gitlab: <code>{{$gitlab_push ? "Yes" : "No" }}</code>
-            </p>
-            <p>
-                Pushes to Ediarum Backend: <code>{{$ediarum_push ? "Yes" : "No" }}</code>
-            </p>
-            <p>
-                Pushes to Existdb: <code>{{$exist_push ? "Yes" : "No" }}</code>
-            </p>
-            <a class="block" href="{{route('projects.edit',['project'=>$project->id])}}">
-                <x-primary-button type="button">Edit</x-primary-button>
-            </a>
+                Ediarum Webdav Path: <code>{{config('app.url')}}/connection/{{ $project->slug }}</code>
+                @if($project->is_in_maintenance_mode)
+                    <span class="text-red-600 font-bold">(In Maintenance Mode!)</span>
+                <form method="POST" action="{{route('projects.disable-maintenance-mode',['projectId'=>$project->id])}}">
+                @csrf
+                <x-primary-button>End Maintenance Mode</x-primary-button>
+                </form>
+            @else
+                <x-primary-button
+                    class="ml-6"
+                    data-modal-target="popup-modal-maintenance-{{$project->id}}"
+                    data-modal-toggle="popup-modal-maintenance-{{$project->id}}"
+                >Disable for Maintenance
+                </x-primary-button>
+                <x-modal :modal_id="'maintenance-' . $project->id">
+                    Maintenance Mode
+                    <div class="mt-10">
+
+                        @if(sizeof($locks) > 0)
+                            <p class="text-red-600 font-bold">There are currently active locks on this project. Please
+                                unlock them before disabling maintenance mode.</p>
+                        @else
+                            <p>Are you sure you want to enable maintenance mode for this project?</p>
+                            <p>During maintenance mode, no one can access the Webdav functionality.</p>
+                            <form method="POST"
+                                  action="{{route('projects.enable-maintenance-mode',['projectId'=>$project->id])}}">
+                                @csrf
+                                <x-primary-button class="mt-4">Yes, Turn On Maintenance Mode</x-primary-button>
+                            </form>
+                        @endif
+
+                    </div>
+                </x-modal>
+                @endif
+                </p>
+                <p>
+                    Data Folder: <code>{{$project->data_folder_location}}</code>
+                </p>
+                <p>
+                    Pushes to Gitlab: <code>{{$gitlab_push ? "Yes: {$project->gitlab_url}" : "No" }}</code>
+                </p>
+                <p>
+                    Pushes to Ediarum Backend: <code>{{$ediarum_push ? "Yes" : "No" }}</code>
+                </p>
+                <p>
+                    Pushes to Existdb:
+                    <code>{{$exist_push ? "Yes: {$project->exist_base_url}/rest{$project->exist_data_path}"  : "No" }}</code>
+                    <x-primary-button
+                        class="ml-6 mt-4"
+                        data-modal-target="popup-modal-existdb-{{$project->id}}"
+                        data-modal-toggle="popup-modal-existdb-{{$project->id}}"
+                    >
+                        Manually Push to eXist-db
+                    </x-primary-button>
+                    <x-modal :modal_id="'existdb-' . $project->id">
+                        Manual eXist-db Synchronization
+                        <div id="app" data-project-id="{{ $project->id }}" data-folders='@json($folders)' class="pt-4"></div>
+                    </x-modal>
+                </p>
+                <a class="block" href="{{route('projects.edit',['project'=>$project->id])}}">
+                    <x-primary-button type="button">Edit</x-primary-button>
+                </a>
 
         </div>
     </x-block>
@@ -45,7 +90,7 @@
                 </form>
             </div>
         @endforeach
-        <livewire:add-user :$users/>
+        <x-add-user :$users/>
     </x-block>
     <x-block>
         <h2 class="text-xl py-4">Webdav Locks</h2>
@@ -110,3 +155,4 @@
         </x-block>
     @endif
 </x-app-layout>
+@vite('resources/ts/app.ts')

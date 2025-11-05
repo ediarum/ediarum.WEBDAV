@@ -4,7 +4,7 @@
     </x-slot>
 
     <a href="{{route('projects.create')}}">
-        <x-primary-button>
+        <x-primary-button class="mb-5">
             Create New Project
         </x-primary-button>
     </a>

@@ -1,7 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+@config "../../tailwind.config.js";
+
+button {
+    @apply hover:cursor-pointer;
+}
 
 code {
     @apply bg-gray-100;

@@ -4,8 +4,6 @@ namespace App\Listeners;
 
 use App\Events\DataChange;
 use App\Jobs\PushToGitlab;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 
@@ -30,7 +28,7 @@ class MakeGitCommit
         }
         $dataRepo = $event->project->data_folder_location;
 
-        $command = "cd $dataRepo &&git add . ";
+        $command = "cd $dataRepo && git add . ";
 
         $command .= " && git -c 'user.name=telotawebdev' -c 'user.email=none@bbaw.de'";
         $command .= " commit -m 'Webdav Change: $event->sourcePath'";

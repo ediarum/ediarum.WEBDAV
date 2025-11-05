@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\DataChange;
 use App\Exceptions\HttpResponse;
 use App\Exceptions\UnknownWebDavHook;
 use App\Models\Project;
@@ -20,8 +19,6 @@ use Illuminate\Support\Facades\Log;
 class PushToExistDb implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-//    private PendingRequest $httpClient;
 
     /**
      * Create a new job instance.
@@ -42,6 +39,9 @@ class PushToExistDb implements ShouldQueue
             $status = $res->status();
             $body = $res->body();
             throw new HttpResponse("Request to $url with status $status and response $body.");
+        }
+        else {
+            Log::debug("Request to " . $res->effectiveUri() . "successful: " . $res->body());
         }
     }
 
@@ -65,6 +65,7 @@ class PushToExistDb implements ShouldQueue
 
     private function putFile(PendingRequest $httpClient, $path)
     {
+        Log::debug("Pushing file: $path");
 
         $dataFolder = $this->project->data_folder_location;
         $fullPath = realpath($dataFolder) . "/" . $path;
@@ -119,7 +120,7 @@ class PushToExistDb implements ShouldQueue
         $baseUrl = rtrim($this->project->exist_base_url, "/");
         $dataPath = trim($this->project->exist_data_path, "/");
         $url = implode("/", [$baseUrl, "rest", $dataPath]);
-        $httpClient = Http::withBasicAuth($this->project->exist_username, $this->project->exist_password)
+        $httpClient = Http::withBasicAuth($this->project->exist_username, $this->project->exist_password ?? "")
             ->baseUrl($url);
 
         switch ($this->webDavEvent) {
