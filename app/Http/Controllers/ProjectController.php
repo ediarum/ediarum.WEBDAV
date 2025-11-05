@@ -47,6 +47,13 @@ class ProjectController extends Controller
         $validated = $request->validated();
         $project = new Project();
         $project->fill($validated);
+
+        foreach($project->getHidden() as $h) {
+            if (isset($validated[$h])) {
+                $project->{$h} = $validated[$h];
+            }
+        }
+        
         $project->save();
 
         LockTableManager::ensureTableForProject($project->id);
