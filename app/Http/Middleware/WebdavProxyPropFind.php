@@ -18,7 +18,9 @@ class WebdavProxyPropFind
     {
         $response = $next($request);
 
-            $proxyRoot = $request->header('X-WebDAV-Proxy-Root');
+        $proxyRoot = $request->header('X-WebDAV-Proxy-Root');
+
+        Log::debug('Webdav Proxy PropFind Middleware Activated with proxy root: ' . $proxyRoot);
 
         if (!$proxyRoot) {
             return $response;
@@ -41,7 +43,7 @@ class WebdavProxyPropFind
 
         $appUrl = config('app.url');
         $appSubpath = parse_url($appUrl, PHP_URL_PATH) ?: '/';
-        $backendRoot = rtrim($appSubpath, "/") . '/webdav';
+        $backendRoot = rtrim($appSubpath, "/") . '/connection';
 
         // Normalize trailing slashes (remove trailing slash for consistency)
         $proxyRoot = rtrim($proxyRoot, '/');

@@ -4,12 +4,12 @@
 ## 1. Install PHP Version
 
 On the server, you need to specify the php version, so:
-`php8.1 /usr/local/bin/composer install`
-`php8.1 artisan migrate:install` etc.
+`php8.3 /usr/local/bin/composer install`
+`php8.3 artisan migrate:install` etc.
 
 ## 2. Install Nginx
 
-The application must be served over nginx or apache.  The file `nginx.conf` shows how to serve the application form a subpath.
+The application must be served over nginx or apache.  The file `nginx.conf` shows how to serve the application from a subpath.
 
 ## 3. Add a queue for pushing to eXist-db
 
@@ -20,7 +20,7 @@ Set up the queue with supervisor. The Supervisor file looks something like this:
 ```text
 [program:ediarum-webdav-laravel-queue-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php8.1 path_to_ediarum.webdav/artisan queue:work --queue=default,gitlab,ediarum-backend,exist-db
+command=php8.3 path_to_ediarum.webdav/artisan queue:work --queue=default,gitlab,ediarum-backend,exist-db
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -35,7 +35,7 @@ We are experimenting with pruning failed jobs. If we decide to do this, this wil
 At the moment it has to be manually run:
 
 ```bash
-php8.1 /path_to_ediarum.webdav/artisan queue:prune-failed
+php8.3 /path_to_ediarum.webdav/artisan queue:prune-failed
 ```
 
 ## 4. Add a Laravel schedule for WebDAV locking system
@@ -45,13 +45,13 @@ The WebDAV locking system requires a scheduler to prevent WebDAV Locks from expi
 Make sure to set up a cronjob for the scheduler:
 
 ```bash
-php8.1 /path_to_ediarum.webdav/artisan schedule:run >> /dev/null 2>&1 
+php8.3 /path_to_ediarum.webdav/artisan schedule:run >> /dev/null 2>&1 
 ```
 
 ## 5. Run server specific commands
 
 * Build the frontend assetss: `npm run build`
-* Generate a Laravel application key: `php8.1 artisan key:generate`
+* Generate a Laravel application key: `php8.3 artisan key:generate`
 
 ## 6. Add proxying
 

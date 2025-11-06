@@ -53,7 +53,7 @@ class ProjectController extends Controller
                 $project->{$h} = $validated[$h];
             }
         }
-        
+
         $project->save();
 
         LockTableManager::ensureTableForProject($project->id);
