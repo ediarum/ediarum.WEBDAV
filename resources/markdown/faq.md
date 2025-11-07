@@ -25,7 +25,7 @@ First do your changes locally:
 Then, deploy your changes to the server:
  1. ssh into the server telotaweb.bbaw.de
  2. `cd /opt/projects/ediarum.webdav/{your_project_folder}` 
- 3. `sudo -u www-data git pull` Note: git pull on telotawebdev MUST always be run as the user www-data (i. e. via `sudo -u www-data …`).
+ 3. `sudo -u www-data git pull` Note: git pull on the server (php-prod) MUST always be run as the user www-data (i. e. via `sudo -u www-data …`).
     git pull will ask for a username and a password, the username must have access
     rights to this repository at gitup.uni-potsdam.de, the password must be a valid
     access token generated via Gitlab. After pulling the repository,

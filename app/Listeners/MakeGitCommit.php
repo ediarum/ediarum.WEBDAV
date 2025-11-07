@@ -30,7 +30,7 @@ class MakeGitCommit
 
         $command = "cd $dataRepo && git add . ";
 
-        $command .= " && git -c 'user.name=telotawebdev' -c 'user.email=none@bbaw.de'";
+        $command .= " && git -c 'user.name=Ediarum' -c 'user.email=none@bbaw.de'";
         $command .= " commit -m 'Webdav Change: $event->sourcePath'";
 
         $result = Process::run($command);
