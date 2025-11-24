@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17285966.svg)](https://doi.org/10.5281/zenodo.17285966)
 
-© 2025 by Berlin-Brandenburg Academy of Sciences and Humanities
+Developed 2025 by Berlin-Brandenburg Academy of Sciences and Humanities
 
 Part of ediarum <https://www.ediarum.org/index.html> (<ediarum@bbaw.de>)
 
@@ -38,9 +38,9 @@ ediarum.WEBDAV includes the following features:
 
 ## Documentation
 
-* For development see [DEVELOPMENT.md](DEVELOPMENT.md).
-* For deployment see [DEPLOYMENT.md](DEPLOYMENT.md).
-* For usage see [USAGE.md](USAGE.md).
+* For development see [DEVELOPMENT.md](documentation/DEVELOPMENT.md).
+* For deployment see [DEPLOYMENT.md](documentation/DEPLOYMENT.md).
+* For usage see [USAGE.md](documentation/USAGE.md).
 
 ## License
 
